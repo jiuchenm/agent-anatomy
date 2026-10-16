@@ -146,6 +146,11 @@ footer { padding: 20px 40px; color: var(--text-dim); font-size: 13px; border-top
 .private-link { color: var(--accent-ink); font-weight: 600; }
 .work-link.active { background: var(--surface-2); font-weight: 600; }
 
+/* 富页面：交互 HTML 片段，iframe sandbox 隔离（仅 allow-scripts，不授 same-origin） */
+.rich-frame { margin: 20px 0; }
+.rich-frame iframe { width: 100%; border: 1px solid var(--border); border-radius: 10px; background: #fff; min-height: 560px; }
+@media (max-width: 820px) { .rich-frame iframe { min-height: 480px; } }
+
 @media (max-width: 820px) {
   #app { grid-template-columns: 1fr; }
   .sidebar { position: fixed; left: -280px; width: 260px; z-index: 50; transition: left .2s; }

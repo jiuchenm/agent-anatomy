@@ -20,6 +20,23 @@ export function mountPrivateLibrary(container, {payloadUrl, fetcher=globalThis.f
   let payload = null, request = null, epoch = 0, disposed = false;
   let workId = null, articleId = null;
 
+  // 富页面高度自适应：sandbox iframe 内 window.parent.postMessage({richHeight:N})，
+  // 父页面校验 event.source 与消息形态后调整高度。不含其它数据交换，不授同源。
+  function onRichResize(event) {
+    if (disposed || !event || !event.source) return;
+    const data = event.data;
+    const height = data && typeof data === 'object' ? data.richHeight : null;
+    if (!Number.isFinite(height) || height <= 0) return;
+    const frames = container.querySelectorAll('[data-private-rich] iframe');
+    for (const frame of frames) {
+      if (frame.contentWindow === event.source) {
+        frame.style.height = Math.max(320, Math.min(height, 12000)) + 'px';
+        break;
+      }
+    }
+  }
+  view.addEventListener('message', onRichResize);
+
   function clear() {
     epoch++; request?.abort(); request = null; erase(payload); payload = null; workId = null; articleId = null;
     container.replaceChildren();
@@ -116,6 +133,7 @@ export function mountPrivateLibrary(container, {payloadUrl, fetcher=globalThis.f
       '<div class="article-heading"><span class="eyebrow">' + esc((payload.modules.find(m => m.id === a.module) || {}).title || '') + ' · ' + esc((payload.works.find(w => w.id === a.work) || {}).name || '') + '</span><h1>' + esc(a.title) + '</h1><p>' + esc(a.summary) + '</p>' +
       (prereq ? '<div class="notes-tools"><span>先修：</span>' + prereq + '</div>' : '') + '</div>' +
       '<article class="prose" data-private-prose></article>' +
+      (a.widget ? '<div class="rich-frame" data-private-rich><iframe title="' + esc(a.title) + ' · 交互演示" sandbox="allow-scripts" loading="lazy"></iframe></div>' : '') +
       '<nav class="article-nav" style="display:flex;gap:10px;justify-content:space-between">' +
       (prev ? '<button class="button light" data-private-article="' + esc(prev.id) + '">← ' + esc(prev.title) + '</button>' : '<span></span>') +
       (next ? '<button class="button light" data-private-article="' + esc(next.id) + '">' + esc(next.title) + ' →</button>' : '<span></span>') +
@@ -142,6 +160,10 @@ export function mountPrivateLibrary(container, {payloadUrl, fetcher=globalThis.f
         else if (!/^https:\/\//i.test(href)) { link.removeAttribute('href'); }
       }
     }).catch(() => {});
+    if (a.widget) {
+      const frame = container.querySelector('[data-private-rich] iframe');
+      if (frame) frame.srcdoc = a.widget;
+    }
     view?.scrollTo(0, 0);
   }
 
@@ -149,6 +171,7 @@ export function mountPrivateLibrary(container, {payloadUrl, fetcher=globalThis.f
     if (disposed) return;
     disposed = true;
     clear();
+    view?.removeEventListener('message', onRichResize);
     view?.removeEventListener('pagehide', lock);
     view?.removeEventListener('pageshow', onPageShow);
   }

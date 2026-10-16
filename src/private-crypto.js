@@ -64,6 +64,9 @@ export function validatePrivatePayload(payload) {
     if (!object(a) || !identifier(a.id) || articleIds.has(a.id) || a.internal !== true || !workIds.has(a.work) || !moduleIds.has(a.module)
       || !text(a.title) || !Number.isInteger(a.order) || !text(a.summary) || !text(a.markdown,1024*1024)
       || !idArray(a.prerequisites) || !idArray(a.sourceIds) || !a.sourceIds.length) fail();
+    // 可选富页面 widget：自包含 HTML 片段（内联 CSS/JS + CSP），仅加密区可见。
+    // 上限 2MB，超出说明体积失控（完整库/大数据应精简为脱敏结构摘要）。
+    if (a.widget !== undefined && !text(a.widget, 2*1024*1024)) fail();
     for (const id of a.sourceIds) { if (!sourceIds.has(id)) fail(); usedSources.add(id); }
     articleIds.add(a.id);
   }
