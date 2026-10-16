@@ -1,38 +1,32 @@
 [
   {
-    "id": "methodology",
-    "name": "写作方法论",
+    "id": "langchain",
+    "name": "LangChain 生态",
     "status": "public",
-    "note": "top-down 讲解法：这是本知识库的写作规范，也是第一篇示范文章。"
-  },
-  {
-    "id": "copilot",
-    "name": "Copilot（公开行为）",
-    "status": "public",
-    "note": "从公开文档与可观察行为拆解 Copilot 的编排、工具调用与上下文管理。"
-  },
-  {
-    "id": "claude-code",
-    "name": "Claude Code",
-    "status": "public",
-    "note": "从公开文档与源码结构拆解其 agent loop、工具协议与 skills 机制。"
+    "summary": "LangChain / LangGraph 的抽象层次、运行时与 agent 编排。"
   },
   {
     "id": "deepseek-harness",
     "name": "DeepSeek Harness",
     "status": "public",
-    "note": "开源评测 harness：数据集、模型接入、采样与打分流程。"
+    "summary": "开源评测 harness：数据集、模型接入、采样与打分流程。"
   },
   {
-    "id": "langchain",
-    "name": "LangChain 生态",
+    "id": "claude-code",
+    "name": "Claude Code",
     "status": "public",
-    "note": "LangChain / LangGraph 的抽象层次、运行时与 agent 编排。"
+    "summary": "从公开文档与源码结构拆解其 agent loop、工具协议与 skills 机制。"
   },
   {
     "id": "pi",
     "name": "Pi / Inflection",
     "status": "public",
-    "note": "面向陪伴型对话的 agent 设计，与工具型 agent 的取舍差异。"
+    "summary": "面向陪伴型对话的 agent 设计，与工具型 agent 的取舍差异。"
+  },
+  {
+    "id": "methodology",
+    "name": "写作方法论",
+    "status": "public",
+    "summary": "top-down 讲解法：本知识库的写作规范，也是第一篇示范文章。"
   }
 ]

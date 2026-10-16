@@ -1,10 +1,12 @@
 import './style.css';
 import 'katex/dist/katex.min.css';
 import {renderMarkdown} from './markdown.js';
+import {mountPrivateLibrary} from './private-library.js';
 import catalog from '../content/catalog.json';
 import works from '../content/works.json';
 
 const articles = import.meta.glob('../content/articles/*.md', {query:'?raw', import:'default', eager:true});
+let privateViewCleanup;
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const THEME_KEY = 'agent-anatomy.theme';
@@ -28,15 +30,18 @@ applyTheme(theme);
 
 // ---- 外壳 ----
 function shell(active){
+  const publicWorks = works.filter(w => w.status === 'public');
   document.querySelector('#app').innerHTML =
     '<a class="skip" href="#main">跳到正文</a>' +
     '<aside class="sidebar">' +
       '<a href="#/" class="brand"><span class="brand-mark">解</span><span>Agent 解剖台<small>AGENT ANATOMY</small></span></a>' +
       '<p class="nav-label">作品</p>' +
-      '<nav>' + works.map(w =>
-        '<a href="#/work/' + w.id + '" class="work-link' + (w.status === 'internal' ? ' internal' : '') + '">' +
-          esc(w.name) + (w.status === 'internal' ? ' <em>本地</em>' : '') + '</a>'
-      ).join('') + '</nav>' +
+      '<nav>' + publicWorks.map(w =>
+        '<a href="#/work/' + w.id + '" class="work-link' + (active === w.id ? ' active' : '') + '">' +
+          esc(w.name) + '</a>'
+      ).join('') +
+      '<a href="#/private" class="work-link private-link' + (active === 'private' ? ' active' : '') + '">🔒 加密区</a>' +
+      '</nav>' +
       '<div class="sidebar-bottom"><div class="small-badge">SOURCE-FAITHFUL</div><p>以源码为据，<br>把机制讲清楚。</p></div>' +
     '</aside>' +
     '<div class="workspace">' +
@@ -61,9 +66,10 @@ function shell(active){
 function home(){
   const byWork = {};
   for (const a of catalog){
+    if (works.find(w => w.id === a.work)?.status !== 'public') continue;
     (byWork[a.work] = byWork[a.work] || []).push(a);
   }
-  const cards = works.map(w => {
+  const cards = works.filter(w => w.status === 'public').map(w => {
     const list = (byWork[w.id] || []).sort((x,y) => x.order - y.order);
     const items = list.map(a =>
       '<a class="lesson-card" href="#/article/' + a.id + '">' +
@@ -71,8 +77,8 @@ function home(){
         '<h3>' + esc(a.title) + '</h3><p>' + esc(a.summary) + '</p>' +
       '</a>'
     ).join('');
-    return '<section class="work-block"><h2>' + esc(w.name) + (w.status === 'internal' ? ' <em class="internal-tag">仅本地</em>' : '') + '</h2>' +
-      (w.note ? '<p class="work-note">' + esc(w.note) + '</p>' : '') +
+    return '<section class="work-block"><h2>' + esc(w.name) + '</h2>' +
+      (w.summary ? '<p class="work-note">' + esc(w.summary) + '</p>' : '') +
       (items ? '<div class="lesson-grid">' + items + '</div>' : '<p class="empty">暂无文章</p>') +
       '</section>';
   }).join('');
@@ -95,7 +101,7 @@ function workPage(workId){
     '</a>'
   ).join('');
   document.querySelector('#main').innerHTML =
-    '<div class="hero slim"><h1>' + esc(w.name) + '</h1>' + (w.note ? '<p>' + esc(w.note) + '</p>' : '') + '</div>' +
+    '<div class="hero slim"><h1>' + esc(w.name) + '</h1>' + (w.summary ? '<p>' + esc(w.summary) + '</p>' : '') + '</div>' +
     (items ? '<div class="lesson-grid">' + items + '</div>' : '<p class="empty">暂无文章</p>');
   document.querySelector('.breadcrumb').textContent = w.name;
 }
@@ -129,11 +135,25 @@ async function articlePage(id){
 function route(){
   const hash = location.hash || '#/';
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
-  shell();
+  privateViewCleanup?.dispose?.();
+  privateViewCleanup = undefined;
+  const active = parts[0] === 'work' && parts[1] ? parts[1] : (parts[0] === 'private' ? 'private' : null);
+  shell(active);
   if (parts.length === 0) return home();
+  if (parts[0] === 'private') return mountPrivate();
   if (parts[0] === 'article' && parts[1]) return articlePage(parts[1]);
   if (parts[0] === 'work' && parts[1]) return workPage(parts[1]);
   return home();
+}
+
+// ---- 加密区 ----
+function mountPrivate(){
+  const main = document.querySelector('#main');
+  privateViewCleanup = mountPrivateLibrary(main, {
+    payloadUrl: new URL('./private-library.json', document.baseURI).href
+  });
+  document.querySelector('.breadcrumb').textContent = '加密区';
+  document.title = '加密区 · Agent Anatomy';
 }
 
 window.addEventListener('hashchange', route);

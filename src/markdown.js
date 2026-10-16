@@ -28,7 +28,8 @@ marked.use({renderer});
 let counter = 0;
 function token(prefix){ return `\u0000${prefix}${counter++}\u0000`; }
 
-export async function renderMarkdown(src){
+// strict 模式用于加密区内容：mermaid 降级为代码块，并禁止可执行/外联标签。
+export async function renderMarkdown(src, {strict=false}={}){
   const maths = [];
   const mmds = [];
 
@@ -47,7 +48,9 @@ export async function renderMarkdown(src){
   let html = marked.parse(text);
 
   // 4. 消毒（仅用户 markdown 产出的 HTML；公式/mermaid 的 SVG 在消毒后注入）
-  html = DOMPurify.sanitize(html, {ADD_ATTR:['target']});
+  html = strict
+    ? DOMPurify.sanitize(html, {ADD_ATTR:['target'], FORBID_TAGS:['style','form','input','textarea','iframe','object','embed','img','svg','math','script'], FORBID_ATTR:['style','src','srcset','ping','onerror','onclick']})
+    : DOMPurify.sanitize(html, {ADD_ATTR:['target']});
 
   // 5. 还原数学公式为 KaTeX
   for (const m of maths){
@@ -57,14 +60,18 @@ export async function renderMarkdown(src){
     html = html.split(m.t).join(out);
   }
 
-  // 6. 还原 mermaid 为 SVG
+  // 6. 还原 mermaid：strict 下降级为代码块，否则渲染 SVG
   for (const m of mmds){
     let out;
-    try {
-      const {svg} = await mermaid.render('mmd-' + Math.random().toString(36).slice(2,10), m.code);
-      out = `<div class="mermaid-box">${svg}</div>`;
-    } catch {
+    if (strict) {
       out = `<pre class="mermaid-fallback"><code>${esc(m.code)}</code></pre>`;
+    } else {
+      try {
+        const {svg} = await mermaid.render('mmd-' + Math.random().toString(36).slice(2,10), m.code);
+        out = `<div class="mermaid-box">${svg}</div>`;
+      } catch {
+        out = `<pre class="mermaid-fallback"><code>${esc(m.code)}</code></pre>`;
+      }
     }
     html = html.split(m.t).join(out);
   }
