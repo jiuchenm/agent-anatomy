@@ -1,0 +1,47 @@
+[
+  {
+    "id": "ez-r1-p1",
+    "title": "EZ撸paper: DeepSeek-R1 论文详解 part 1",
+    "type": "video",
+    "author": "EZ.Encoder Academy",
+    "url": "https://www.youtube.com/watch?v=tRuN8xYdETs",
+    "coverage": "R1 概览与 Abstract/Introduction 的 top-down 读法",
+    "checked": "2026-10-16"
+  },
+  {
+    "id": "ez-r1-p2",
+    "title": "EZ撸paper: DeepSeek-R1 论文详解 part 2",
+    "type": "video",
+    "author": "EZ.Encoder Academy",
+    "url": "https://www.youtube.com/watch?v=_dLlfAPuilM",
+    "coverage": "AGI 定义、RL 快速入门、AlphaGo/AlphaZero",
+    "checked": "2026-10-16"
+  },
+  {
+    "id": "ez-r1-p3",
+    "title": "EZ撸paper: DeepSeek-R1 论文详解 part 3",
+    "type": "video",
+    "author": "EZ.Encoder Academy",
+    "url": "https://www.youtube.com/watch?v=6fPvbIFF_wY",
+    "coverage": "GPT 发展史、scaling law、训练范式、涌现",
+    "checked": "2026-10-16"
+  },
+  {
+    "id": "ez-r1-p4",
+    "title": "EZ撸paper: DeepSeek-R1 论文详解 part 4",
+    "type": "video",
+    "author": "EZ.Encoder Academy",
+    "url": "https://www.youtube.com/watch?v=JHrt8_YnmWA",
+    "coverage": "推理能力、思维链、LLM 如何思考",
+    "checked": "2026-10-16"
+  },
+  {
+    "id": "ez-r1-p5",
+    "title": "EZ撸paper: DeepSeek-R1 论文详解 part 5",
+    "type": "video",
+    "author": "EZ.Encoder Academy",
+    "url": "https://www.youtube.com/watch?v=-9HODvpVD2o",
+    "coverage": "R1 创新点、后续工作、过度思考与欠思考",
+    "checked": "2026-10-16"
+  }
+]

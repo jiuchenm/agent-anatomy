@@ -1,0 +1,19 @@
+[
+  {
+    "id": "methodology-top-down",
+    "title": "如何 top-down 讲解一个知识点",
+    "work": "methodology",
+    "order": 1,
+    "prerequisites": [],
+    "summary": "从 EZ撸paper 系列提炼的自上而下讲解法：先给模糊路线图，再局部解释术语、用类比讲机制，最后交代证据边界。",
+    "sourceIds": [
+      "ez-r1-p1",
+      "ez-r1-p2",
+      "ez-r1-p3",
+      "ez-r1-p4",
+      "ez-r1-p5"
+    ],
+    "updated": "2026-10-16",
+    "internal": false
+  }
+]
